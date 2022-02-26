@@ -118,7 +118,7 @@ exports.updateRecord = async (req, res) => {
 
     //Remove any previous images saved to the server that have been changed
     if (myObj.image !== returnedDocument.image) {
-      let filePathAndName = `../client/public/images/${returnedDocument.image}`;
+      let filePathAndName = `./client/public/images/${returnedDocument.image}`;
       if (returnedDocument.image !== 'placeholder.jpg') {
         fs.unlink(filePathAndName, (err) => {
           if (err) console.log(err);
@@ -150,7 +150,7 @@ exports.deleteRecord = async (req, res) => {
 
     returnDocument(db_connect, myQuery).then((returnedDocument) => {
       // Delete image file from server
-      let filePathAndName = `../client/public/images/${returnedDocument.image}`;
+      let filePathAndName = `./client/public/images/${returnedDocument.image}`;
       if (returnedDocument.image !== 'placeholder.jpg') {
         fs.unlink(filePathAndName, (err) => {
           if (err) console.log(err);
