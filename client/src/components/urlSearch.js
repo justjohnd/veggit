@@ -27,7 +27,7 @@ export default function UrlSearch(props) {
 
     try {
       props.loaderCallback(true);
-      const response = await axios.post(`http://${httpAddress}/urlSearch`, getUrl, {
+      const response = await axios.post(`${httpAddress}/urlSearch`, getUrl, {
       headers: {
         'Content-Type': 'application/json',
       }

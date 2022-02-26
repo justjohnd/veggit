@@ -77,7 +77,7 @@ export default function Create(props) {
     }
 
     try {
-      await axios.post(`http://${httpAddress}/record/add`, formData);
+      await axios.post(`${httpAddress}/record/add`, formData);
       navigate('/private');
     } catch (error) {
       setError(error.response.data.error);
