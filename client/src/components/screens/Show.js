@@ -30,7 +30,7 @@ export default function Show() {
   // This will get the record based on the id from the database.
   useEffect(() => {
     axios
-      .get(`https://secret-springs-85430.herokuapp.com//record/${params.id}`)
+      .get(`${httpAddress}/record/${params.id}`)
       .then((response) => {
         let myObj = {};
         for (let i = 0; i < RECIPE_PROPERTIES.length; i++) {

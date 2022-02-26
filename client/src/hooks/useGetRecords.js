@@ -7,7 +7,7 @@ export default function useGetRecords(route) {
 
   useEffect(() => {
     axios
-      .get(`https://secret-springs-85430.herokuapp.com/${route}/`)
+      .get(`${httpAddress}${route}/`)
       .then((response) => {
         for (let i = 0; i < response.data.length; i++) {
           // Verify lastModified data is available, if not, add arbitrary older date to place   those items at bottom of list

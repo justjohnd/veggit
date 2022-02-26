@@ -27,7 +27,7 @@ export default function UrlSearch(props) {
 
     try {
       props.loaderCallback(true);
-      const response = await axios.post(`https://secret-springs-85430.herokuapp.com//urlSearch`, getUrl, {
+      const response = await axios.post(`${httpAddress}/urlSearch`, getUrl, {
       headers: {
         'Content-Type': 'application/json',
       }
