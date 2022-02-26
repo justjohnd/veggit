@@ -4,12 +4,11 @@
   "description": "veggit backend",
   "main": "server.js",
   "scripts": {
+    "build": "cd ../client && npm run build",
     "start": "node server.js",
     "server": "nodemon server.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install npm && run build"
-  },
-  "engines": {
-    "node": "10.16.0"
+    "client-install": "cd ../client && npm install",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run install-client && npm run build"
   },
   "keywords": [],
   "author": "",
