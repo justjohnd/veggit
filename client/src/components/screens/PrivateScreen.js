@@ -86,7 +86,7 @@ const PrivateScreen = (props) => {
 // This method will delete a record based on the method
 const deleteRecord = async (id) => {
   try {
-    await axios.delete(`${httpAddress}/${id}`);
+    await axios.delete(`https://secret-springs-85430.herokuapp.com//${id}`);
   } catch (error) {
     setError(error.response.data.error);
     setTimeout(() => {

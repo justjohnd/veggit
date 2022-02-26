@@ -96,7 +96,7 @@ export default function Edit() {
 
     // This will send a post{} request to update the data in the database.
     try {
-      await axios.post(`${httpAddress}/update/${params.id}`, formData);
+      await axios.post(`https://secret-springs-85430.herokuapp.com//update/${params.id}`, formData);
     } catch (error) {
       setError(error.response.data.error);
       setTimeout(() => {
@@ -108,7 +108,7 @@ export default function Edit() {
   // This will get the record based on the id from the database.
   useEffect(() => {
     axios
-      .get(`${httpAddress}/record/${params.id}`)
+      .get(`https://secret-springs-85430.herokuapp.com//record/${params.id}`)
       .then((response) => {
         // image will load separately in the image varialbe, apart from other properties in the receipe variable
         let myObj = {};
