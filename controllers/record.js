@@ -1,4 +1,5 @@
 const fs = require('fs');
+const aws = require('aws-sdk');
 
 const RECIPE_PROPERTIES = [
   'title',
@@ -14,6 +15,9 @@ const RECIPE_PROPERTIES = [
   'dateCreated',
   'userId',
 ];
+
+const S3_KEY_ID = process.env.S3_KEY_ID;
+const S3_SECRET = process.env.S3_SECRET;
 
 // This will help us connect to the database
 const dbo = require('../db/conn');
@@ -38,7 +42,12 @@ function setObject(reqData) {
     if (RECIPE_PROPERTIES[i] === 'image') {
       //First, check to see if image is a url
       if (reqData.file) {
-        myObj['image'] = reqData.file.filename;
+        // Replace reqData.file.location with reqData.file.filename if storing images on a local server
+        if (reqData.file.location) {
+          myObj['image'] = reqData.file.location;
+        } else {
+          myObj['image'] = reqData.file.filename;
+        }
       } else if (!reqData.body.image) {
         myObj['image'] = 'placeholder.jpg';
       } else {
@@ -55,6 +64,42 @@ function setObject(reqData) {
 
   return myObj;
 }
+
+//Manage s3 images
+const s3 = new aws.S3({
+  secretAccessKey: S3_SECRET,
+  accessKeyId: S3_KEY_ID,
+  region: 'ap-northeast-1',
+  Bucket: 'veggit-images',
+});
+
+//Delete images from s3
+const deleteS3 = function (image) {
+  const filename = image.substring(54);
+
+  const params = {
+    Bucket: 'veggit-images',
+    Key: filename
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.createBucket(
+      {
+        Bucket: 'veggit-images',
+      },
+      function () {
+        s3.deleteObject(params, function (err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Successfully deleted file from bucket');
+          }
+          console.log(data);
+        });
+      }
+    );
+  });
+};
 
 //when working with the database always use async functions
 exports.allRecords = async (req, res, next) => {
@@ -89,6 +134,7 @@ exports.getRecord = async (req, res) => {
 };
 
 exports.addRecord = async (req, res) => {
+
   try {
     let db_connect =  await dbo.getDb();
 
@@ -104,6 +150,7 @@ exports.addRecord = async (req, res) => {
   } catch (error) {
     res.json(error);
   }
+
 };
 
 exports.updateRecord = async (req, res) => {
@@ -121,10 +168,16 @@ exports.updateRecord = async (req, res) => {
       let filePathAndName = `./client/public/images/${returnedDocument.image}`;
       if (returnedDocument.image !== 'placeholder.jpg') {
         fs.unlink(filePathAndName, (err) => {
-          if (err) console.log(err);
+          if (err) console.log('No image found to remove: ', err);
         });
       }
+
+      //Remove previous image from s3
+      if (returnedDocument.image !== 'placeholder.jpg') {
+        deleteS3(returnedDocument.image);
+      }
     }
+
 
     let newvalues = {
       $set: myObj,
@@ -149,6 +202,7 @@ exports.deleteRecord = async (req, res) => {
     let myQuery = { _id: ObjectId(req.params.id) };
 
     returnDocument(db_connect, myQuery).then((returnedDocument) => {
+    
       // Delete image file from server
       let filePathAndName = `./client/public/images/${returnedDocument.image}`;
       if (returnedDocument.image !== 'placeholder.jpg') {
@@ -156,6 +210,8 @@ exports.deleteRecord = async (req, res) => {
           if (err) console.log(err);
         });
       }
+
+      deleteS3(returnedDocument.image);
     
       db_connect.collection('records').deleteOne(myQuery, function (err, response) {
         if (err) throw err;
