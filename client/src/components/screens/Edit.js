@@ -11,44 +11,16 @@ import { getWithExpiry } from "../../hooks/localStorageWithExpiry";
 // This will require to npm install axios
 import axios from "axios";
 
-export default function Edit(props) {
-  const [pageType, setPageType] = useState("Edit");
+export default function Edit({ loaderCallback }) {
   const [recipe, setRecipe] = useState(RECIPE_OBJECT);
-  const [newImage, setNewImage] = useState({ name: "noImage" });
-  const [image, setImage] = useState("");
-  const [changeImage, setChangeImage] = useState(false);
   const [error, setError] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
+  const [imagePreview, setImagePreview] = useState(
+    "../../images/placeholder.jpg"
+  );
+
+  const pageType = "Edit";
 
   const navigate = useNavigate();
-
-  function changeImageCallback(data) {
-    setChangeImage(true);
-    if (data === "remove") {
-      setNewImage({ name: "noImage" });
-      setImagePreview("../../images/placeholder.jpg");
-      setImage("placeholder.jpg");
-      setChangeImage(false);
-    }
-  }
-
-  // Triggered by image input field
-  function imageCallback(data) {
-    setNewImage(data);
-    if (data) {
-      setImagePreview(URL.createObjectURL(data));
-    }
-  }
-
-  //Receive selected categories and set to recipe
-  function categoriesCallback(optionSelected) {
-    setRecipe((prevValue) => {
-      return {
-        ...prevValue,
-        categories: optionSelected,
-      };
-    });
-  }
 
   let params = useParams();
 
@@ -56,40 +28,43 @@ export default function Edit(props) {
   const handleRecipe = async (e) => {
     e.preventDefault();
 
+    //Formata() object replicates functions of HTML form, but bundles each element in an array. this is necessary to be able to send uploaded files
     const formData = new FormData();
 
     if (!recipe.dateCreated) {
       recipe.dateCreated = new Date();
     }
 
+    //At minimum, categeory "Other" will always be set if no other categories are set
+    !recipe.categories[0] &&
+      recipe.categories.push({ value: "other", label: "Other" });
+
     for (let i = 0; i < RECIPE_PROPERTIES.length; i++) {
-      if (RECIPE_PROPERTIES[i] === "image") {
-        //Various edge cases included here, including possiblity of a null value coming from the database, or a local server being used
-        if (!image) {
-          formData.append("image", newImage);
-        } else if (image !== newImage.name && newImage.name !== "noImage") {
-          formData.append("image", newImage);
-        } else {
-          formData.append("image", image);
+      if (recipe[RECIPE_PROPERTIES[i]] instanceof File) {
+        formData.append(RECIPE_PROPERTIES[i], recipe[RECIPE_PROPERTIES[i]]);
+      } else if (RECIPE_PROPERTIES[i] === "image") {
+        //If an image is entered and then removed, recipe.image will set to undefined. Changing to "", will cause a stock image to automatically load on the backend
+        if (recipe.image === "") {
+          formData.append("image", "");
         }
       } else {
         formData.append(
           RECIPE_PROPERTIES[i],
           JSON.stringify(recipe[RECIPE_PROPERTIES[i]])
         );
+        console.log(RECIPE_PROPERTIES[i], recipe[RECIPE_PROPERTIES[i]]);
       }
     }
 
-    // This will send a post{} request to update the data in the database.
     try {
-      props.loaderCallback(true);
-      await axios.post(`${httpAddress}/update/${params.id}`, formData);
+      loaderCallback(true);
+      await axios.put(`${httpAddress}/update/${params.id}`, formData);
       setTimeout(() => {
         navigate("/private");
-        props.loaderCallback(false);
+        loaderCallback(false);
       }, 2000);
     } catch (error) {
-      props.loaderCallback(false);
+      loaderCallback(false);
       setError(error.response.data.error);
       setTimeout(() => {
         setError("");
@@ -108,19 +83,15 @@ export default function Edit(props) {
 
     try {
       const fetchData = async () => {
+        //Destructure the data object payload
         const { data } = await axios.get(`${httpAddress}/record/${params.id}`);
 
-        // image will load separately in the image varialbe, apart from other properties in the receipe variable
         let myObj = {};
         for (let i = 0; i < RECIPE_PROPERTIES.length; i++) {
+          // Only set the image. recipe.image will remain undefined until either a new image is loaded or the existing image is removed
           if (RECIPE_PROPERTIES[i] === "image") {
-            setImage(data.image);
-
-            if (data.image !== null && data.image.slice(0, 4) === "http") {
-              setImagePreview(data.image);
-            } else {
-              setImagePreview("../../images/" + data.image);
-            }
+            //Image is set as a url
+            setImagePreview(data.image);
           } else {
             myObj[RECIPE_PROPERTIES[i]] = data[RECIPE_PROPERTIES[i]];
           }
@@ -138,18 +109,15 @@ export default function Edit(props) {
   // This following section will display the form that takes the input from the user.
   return (
     <div>
+      {error && <div className="error-message">{error}</div>}
       <TemplateCreateEdit
         pageType={pageType}
         handleRecipe={handleRecipe}
         recipe={recipe}
         setRecipe={setRecipe}
         instructions={recipe.analyzedInstructions}
-        image={image}
         imagePreview={imagePreview}
-        imageCallback={imageCallback}
-        changeImage={changeImage}
-        changeImageCallback={changeImageCallback}
-        categoriesCallback={categoriesCallback}
+        setImagePreview={setImagePreview}
       />
     </div>
   );
