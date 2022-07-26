@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import RecipesSelected from "../recipesSelected";
-import Button from "../button";
+import RecipesSelected from "../RecipesSelected";
+import Button from "../Button";
 import RecipeGroup from "../recipeGroup";
-import CategoryDropdown from "../categoryDropdown";
+import CategoryDropdown from "../CategoryDropdown";
 
 import { categories } from "../../javascript/categories";
 import httpAddress from "../../javascript/httpAddress";

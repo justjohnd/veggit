@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import RECIPE_PROPERTIES from "../../javascript/RECIPE_PROPERTIES";
 import httpAddress from "../../javascript/httpAddress";
-import IngredientGroup from "../ingredientGroup";
+import IngredientGroup from "../IngredientGroup";
+
+import "./Show.css";
 
 import { v4 as uuidv4 } from "uuid";
 
