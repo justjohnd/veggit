@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import TemplateCreateEdit from "../templateCreateEdit";
+import TemplateCreateEdit from "../TemplateCreateEdit";
 
 import RECIPE_PROPERTIES, {
   RECIPE_OBJECT,
@@ -28,6 +28,13 @@ export default function Edit({ loaderCallback }) {
   const handleRecipe = async (e) => {
     e.preventDefault();
 
+    //Make sure title isn't an empty field
+    if (!recipe.title) {
+      setError("Please add a title before submitting.");
+      window.scrollTo(0, 0);
+      return;
+    }
+
     //Formata() object replicates functions of HTML form, but bundles each element in an array. this is necessary to be able to send uploaded files
     const formData = new FormData();
 
@@ -52,7 +59,6 @@ export default function Edit({ loaderCallback }) {
           RECIPE_PROPERTIES[i],
           JSON.stringify(recipe[RECIPE_PROPERTIES[i]])
         );
-        console.log(RECIPE_PROPERTIES[i], recipe[RECIPE_PROPERTIES[i]]);
       }
     }
 
@@ -87,11 +93,15 @@ export default function Edit({ loaderCallback }) {
         const { data } = await axios.get(`${httpAddress}/record/${params.id}`);
 
         let myObj = {};
+
         for (let i = 0; i < RECIPE_PROPERTIES.length; i++) {
           // Only set the image. recipe.image will remain undefined until either a new image is loaded or the existing image is removed
           if (RECIPE_PROPERTIES[i] === "image") {
-            //Image is set as a url
-            setImagePreview(data.image);
+            //The record may or may not have an image property assigned to it. Some records may have the property "placeholder.jpg" assigned to their image
+            if (data.image && data.image !== "placeholder.jpg") {
+              //Image is set as a url
+              setImagePreview(data.image);
+            }
           } else {
             myObj[RECIPE_PROPERTIES[i]] = data[RECIPE_PROPERTIES[i]];
           }
