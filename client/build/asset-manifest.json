@@ -1,13 +1,25 @@
 {
   "files": {
-    "main.css": "/static/css/main.ea8fea55.css",
-    "main.js": "/static/js/main.4763d008.js",
+<<<<<<< HEAD
+    "main.css": "/static/css/main.59e25ab9.css",
+    "main.js": "/static/js/main.cf880109.js",
     "index.html": "/index.html",
-    "main.ea8fea55.css.map": "/static/css/main.ea8fea55.css.map",
-    "main.4763d008.js.map": "/static/js/main.4763d008.js.map"
+    "main.59e25ab9.css.map": "/static/css/main.59e25ab9.css.map",
+    "main.cf880109.js.map": "/static/js/main.cf880109.js.map"
   },
   "entrypoints": [
-    "static/css/main.ea8fea55.css",
-    "static/js/main.4763d008.js"
+    "static/css/main.59e25ab9.css",
+    "static/js/main.cf880109.js"
+=======
+    "main.css": "/static/css/main.90e9b453.css",
+    "main.js": "/static/js/main.580d80d1.js",
+    "index.html": "/index.html",
+    "main.90e9b453.css.map": "/static/css/main.90e9b453.css.map",
+    "main.580d80d1.js.map": "/static/js/main.580d80d1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.90e9b453.css",
+    "static/js/main.580d80d1.js"
+>>>>>>> main
   ]
 }
