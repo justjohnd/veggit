@@ -37,7 +37,7 @@ const LoginScreen = (props) => {
       //Return succss and token as data
       const { data } = await axios.post(
         // Routes are set in server.js
-        "https://veggit.onrender.com/api/auth/login",
+        "/api/auth/login",
         { email, password },
         config
       );
